@@ -1320,7 +1320,7 @@ if (typeof jQuery === 'undefined') {
       // Handle viewport object with selector
       if (viewport.selector) {
         // Validate and sanitize the selector
-        if (typeof viewport.selector !== 'string' || /[<>]/.test(viewport.selector)) {
+        if (typeof viewport.selector !== 'string' || !/^[#.]?[\w-]+$/.test(viewport.selector)) {
           console.warn('Invalid viewport.selector provided. Defaulting to "body".');
           viewport.selector = 'body';
         }
@@ -1328,8 +1328,11 @@ if (typeof jQuery === 'undefined') {
           viewportEl = document.body
         } else if (viewport.selector.charAt(0) === '#') {
           viewportEl = document.getElementById(viewport.selector.substr(1))
-        } else {
+        } else if (viewport.selector.charAt(0) === '.') {
           viewportEl = document.querySelector(viewport.selector)
+        } else {
+          console.warn('Unsupported selector type. Defaulting to "body".');
+          viewportEl = document.body;
         }
         this.$viewport = viewportEl ? $(viewportEl) : $(document.body)
       } else {
