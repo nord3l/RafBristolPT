@@ -1,9 +1,16 @@
 source "https://rubygems.org"
 
-gem "jekyll", "~> 3.9.3" # Jekyll 3.x series is compatible with Ruby 2.6
-gem "webrick" # Required for Jekyll on Ruby 3.x
+# Jekyll with specific version for compatibility
+gem "jekyll", "~> 3.9.3"
+gem "kramdown-parser-gfm" # Required for Jekyll 3.x with newer kramdown
+
+# Required for Ruby 3.x compatibility
+gem "webrick" 
+
+# Additional dependencies
 gem "logger"
 gem "csv"
 gem "base64"
-gem "kramdown-parser-gfm" # Required for Jekyll 3.x with newer kramdown
-gem "html-proofer" # For linting HTML in CI
+
+# For linting HTML in CI
+gem "html-proofer"
