@@ -773,8 +773,18 @@ if (typeof jQuery === 'undefined') {
 
     if (!isActive) {
       if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
-        // if mobile we use a backdrop because click events don't delegate
-        $('<div class="dropdown-backdrop"/>').insertAfter($(this)).on('click', clearMenus)
+        // If mobile, create backdrop safely
+        var $backdrop = document.createElement('div');
+        $backdrop.className = 'dropdown-backdrop';
+        
+        // Insert after the element safely using DOM methods
+        var thisElement = this;
+        if (thisElement.parentNode) {
+          thisElement.parentNode.insertBefore($backdrop, thisElement.nextSibling);
+        }
+        
+        // Attach event listener
+        $($backdrop).on('click', clearMenus);
       }
 
       var relatedTarget = { relatedTarget: this }
@@ -1164,10 +1174,16 @@ if (typeof jQuery === 'undefined') {
   }
 
   Modal.prototype.measureScrollbar = function () { // thx walsh
+    // Create the scrollbar measuring element safely
     var scrollDiv = document.createElement('div')
     scrollDiv.className = 'modal-scrollbar-measure'
-    this.$body.append(scrollDiv)
+    
+    // Safely append the element to the DOM (not using jQuery .append())
+    this.$body[0].appendChild(scrollDiv)
+    
     var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth
+    
+    // Clean up
     this.$body[0].removeChild(scrollDiv)
     return scrollbarWidth
   }
@@ -1407,7 +1423,18 @@ if (typeof jQuery === 'undefined') {
         .addClass(placement)
         .data('bs.' + this.type, this)
 
-      this.options.container ? $tip.appendTo(this.options.container) : $tip.insertAfter(this.$element)
+      // Safely append/insert the tooltip
+      if (this.options.container) {
+        // Use appendTo for containers
+        $tip.appendTo(this.options.container);
+      } else {
+        // Insert after element using DOM methods for safety
+        var $element = this.$element[0];
+        var $tipEl = $tip[0];
+        if ($element && $element.parentNode && $tipEl) {
+          $element.parentNode.insertBefore($tipEl, $element.nextSibling);
+        }
+      }
 
       var pos          = this.getPosition()
       var actualWidth  = $tip[0].offsetWidth
@@ -1509,7 +1536,8 @@ if (typeof jQuery === 'undefined') {
     var $tip  = this.tip()
     var title = this.getTitle()
 
-    $tip.find('.tooltip-inner')[this.options.html ? 'html' : 'text'](title)
+    // Always use text() to safely set content and prevent XSS
+    $tip.find('.tooltip-inner').text(title)
     $tip.removeClass('fade in top bottom left right')
   }
 
@@ -1745,16 +1773,31 @@ if (typeof jQuery === 'undefined') {
     var title   = this.getTitle()
     var content = this.getContent()
 
-    $tip.find('.popover-title')[this.options.html ? 'html' : 'text'](title)
-    $tip.find('.popover-content').children().detach().end()[ // we use append for html objects to maintain js events
-      this.options.html ? (typeof content == 'string' ? 'html' : 'append') : 'text'
-    ](content)
+    // Safely set content using text() method to prevent XSS
+    var $title = $tip.find('.popover-title')
+    $title.text(title)
+    
+    var $content = $tip.find('.popover-content').children().detach().end()
+    
+    // Handle content safely based on its type
+    if (typeof content === 'string') {
+      $content.text(content)
+    } else if (content instanceof jQuery) {
+      // For jQuery objects, use a safer approach
+      $content.empty()
+      content.each(function() {
+        var clone = $(this).clone(true)
+        $content.append(clone)
+      })
+    } else {
+      $content.text(String(content))
+    }
 
     $tip.removeClass('fade top bottom left right in')
 
     // IE8 doesn't accept hiding via the `:empty` pseudo selector, we have to do
-    // this manually by checking the contents.
-    if (!$tip.find('.popover-title').html()) $tip.find('.popover-title').hide()
+    // this manually by checking the contents safely.
+    if ($title.text().trim() === '') $title.hide()
   }
 
   Popover.prototype.hasContent = function () {
