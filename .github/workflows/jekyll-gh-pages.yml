@@ -33,8 +33,7 @@ jobs:
         with:
           ruby-version: '2.7'
           bundler-cache: true
-      - name: Install dependencies
-        run: bundle install
+      # No need for explicit bundle install since bundler-cache: true handles it
       - name: Build with Jekyll
         run: bundle exec jekyll build
       - name: Run HTML Proofer
@@ -50,11 +49,15 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          source: ./
-          destination: ./_site
+          ruby-version: '2.7'
+          bundler-cache: true
+      - name: Build with Jekyll
+        run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
