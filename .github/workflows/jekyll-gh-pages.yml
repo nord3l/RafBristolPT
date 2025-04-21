@@ -33,6 +33,7 @@ jobs:
         with:
           ruby-version: '3.2'
           bundler-cache: true
+          bundler: '2.4.10'
       # No need for explicit bundle install since bundler-cache: true handles it
       - name: Build with Jekyll
         run: bundle exec jekyll build
@@ -54,6 +55,7 @@ jobs:
         with:
           ruby-version: '3.2'
           bundler-cache: true
+          bundler: '2.4.10'
       - name: Build with Jekyll
         run: bundle exec jekyll build
         env:
