@@ -109,7 +109,8 @@ if (typeof jQuery === 'undefined') {
       selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
     }
 
-    var $parent = $(selector)
+    // Safely handle selector by using getElementById
+    var $parent = selector ? $(document.getElementById(selector.replace(/^#/, ''))) : $()
 
     if (e) e.preventDefault()
 
@@ -498,7 +499,9 @@ if (typeof jQuery === 'undefined') {
   var clickHandler = function (e) {
     var href
     var $this   = $(this)
-    var $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) // strip for ie7
+    // Safely handle targets by sanitizing the selector
+    var targetSelector = $this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '');
+    var $target = targetSelector ? $(document.getElementById(targetSelector.replace(/^#/, ''))) : $();
     if (!$target.hasClass('carousel')) return
     var options = $.extend({}, $target.data(), $this.data())
     var slideIndex = $this.attr('data-slide-to')
@@ -544,7 +547,14 @@ if (typeof jQuery === 'undefined') {
   var Collapse = function (element, options) {
     this.$element      = $(element)
     this.options       = $.extend({}, Collapse.DEFAULTS, options)
-    this.$trigger      = $(this.options.trigger).filter('[href="#' + element.id + '"], [data-target="#' + element.id + '"]')
+    // Safely handle trigger selector by using a safer filter approach
+    var elementId = element.id;
+    this.$trigger = $(document).find(this.options.trigger).filter(function() {
+      var $this = $(this);
+      var href = $this.attr('href');
+      var target = $this.attr('data-target');
+      return (href && href === '#' + elementId) || (target && target === '#' + elementId);
+    })
     this.transitioning = null
 
     if (this.options.parent) {
@@ -687,7 +697,8 @@ if (typeof jQuery === 'undefined') {
     var target = $trigger.attr('data-target')
       || (href = $trigger.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') // strip for ie7
 
-    return $(target)
+    // Safely get target element by using getElementById
+    return target ? $(document.getElementById(target.replace(/^#/, ''))) : $()
   }
 
 
@@ -863,7 +874,13 @@ if (typeof jQuery === 'undefined') {
       selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
     }
 
-    var $parent = selector && $(selector)
+    // Safely select parent element
+    var $parent
+    if (selector && selector.charAt(0) === '#') {
+      $parent = $(document.getElementById(selector.substr(1)))
+    } else {
+      $parent = selector ? $(selector) : $()
+    }
 
     return $parent && $parent.length ? $parent : $this.parent()
   }
@@ -1223,9 +1240,11 @@ if (typeof jQuery === 'undefined') {
   // ==============
 
   $(document).on('click.bs.modal.data-api', '[data-toggle="modal"]', function (e) {
-    var $this   = $(this)
-    var href    = $this.attr('href')
-    var $target = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) // strip for ie7
+    var $this = $(this)
+    var href = $this.attr('href')
+    // Safely handle target selector
+    var targetSelector = $this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))
+    var $target = targetSelector ? $(document.getElementById(targetSelector.replace(/^#/, ''))) : $()
     var option  = $target.data('bs.modal') ? 'toggle' : $.extend({ remote: !/#/.test(href) && href }, $target.data(), $this.data())
 
     if ($this.is('a')) e.preventDefault()
@@ -1293,7 +1312,28 @@ if (typeof jQuery === 'undefined') {
     this.type      = type
     this.$element  = $(element)
     this.options   = this.getOptions(options)
-    this.$viewport = this.options.viewport && $(this.options.viewport.selector || this.options.viewport)
+    // Safely handle viewport setting
+    if (this.options.viewport) {
+      var viewport = this.options.viewport
+      var viewportEl
+      
+      // Handle viewport object with selector
+      if (viewport.selector) {
+        if (viewport.selector === 'body') {
+          viewportEl = document.body
+        } else if (viewport.selector.charAt(0) === '#') {
+          viewportEl = document.getElementById(viewport.selector.substr(1))
+        } else {
+          viewportEl = document.querySelector(viewport.selector)
+        }
+        this.$viewport = viewportEl ? $(viewportEl) : $(document.body)
+      } else {
+        // Handle direct element reference
+        this.$viewport = $(viewport)
+      }
+    } else {
+      this.$viewport = null
+    }
 
     var triggers = this.options.trigger.split(' ')
 
@@ -2203,7 +2243,23 @@ if (typeof jQuery === 'undefined') {
   var Affix = function (element, options) {
     this.options = $.extend({}, Affix.DEFAULTS, options)
 
-    this.$target = $(this.options.target)
+    // Safely select target using querySelector if it's a selector
+    var targetOption = this.options.target
+    var target
+    
+    if (typeof targetOption === 'string') {
+      // Use a safer method to get the target element
+      if (targetOption.charAt(0) === '#') {
+        target = document.getElementById(targetOption.substr(1))
+      } else {
+        target = document.querySelector(targetOption)
+      }
+      this.$target = target ? $(target) : $()
+    } else {
+      this.$target = $(targetOption)
+    }
+    
+    this.$target
       .on('scroll.bs.affix.data-api', $.proxy(this.checkPosition, this))
       .on('click.bs.affix.data-api',  $.proxy(this.checkPositionWithEventLoop, this))
 
