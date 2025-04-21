@@ -1337,7 +1337,18 @@ if (typeof jQuery === 'undefined') {
         this.$viewport = viewportEl ? $(viewportEl) : $(document.body)
       } else {
         // Handle direct element reference
-        this.$viewport = $(viewport)
+        if (typeof viewport === 'string') {
+          try {
+            viewportEl = document.querySelector(viewport);
+          } catch (e) {
+            viewportEl = null;
+          }
+          this.$viewport = viewportEl ? $(viewportEl) : $(document.body);
+        } else if (viewport instanceof Element || (viewport && viewport.jquery)) {
+          this.$viewport = $(viewport);
+        } else {
+          this.$viewport = $(document.body);
+        }
       }
     } else {
       this.$viewport = null
