@@ -13,7 +13,7 @@ gem "csv"
 gem "base64"
 
 # For linting HTML in CI
-gem "html-proofer"
+gem "html-proofer", "~> 5.0.10"
 
 # Security updates - version compatible with Ruby 3.2
 gem "nokogiri", ">= 1.18.4"
