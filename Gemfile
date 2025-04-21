@@ -6,3 +6,4 @@ gem "logger"
 gem "csv"
 gem "base64"
 gem "kramdown-parser-gfm" # Required for Jekyll 3.x with newer kramdown
+gem "html-proofer" # For linting HTML in CI
