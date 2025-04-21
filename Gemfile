@@ -12,5 +12,8 @@ gem "logger"
 gem "csv"
 gem "base64"
 
-# For linting HTML in CI
-gem "html-proofer"
+# For linting HTML in CI - using older version with compatible options
+gem "html-proofer", "~> 3.19.4"
+
+# Security updates - version compatible with Ruby 3.2
+gem "nokogiri", ">= 1.18.4"
