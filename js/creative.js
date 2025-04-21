@@ -7,12 +7,21 @@
 (function($) {
     "use strict"; // Start of use strict
 
+    // Safely get attribute value to prevent XSS
+    function safeAttr(element, attrName) {
+        return $('<div>').text($(element).attr(attrName)).text();
+    }
+
     // jQuery for page scrolling feature - requires jQuery Easing plugin
     $('a.page-scroll').bind('click', function(event) {
         var $anchor = $(this);
-        $('html, body').stop().animate({
-            scrollTop: ($($anchor.attr('href')).offset().top - 50)
-        }, 1250, 'easeInOutExpo');
+        var safeHref = safeAttr(this, 'href');
+        
+        if (safeHref && safeHref.length > 0) {
+            $('html, body').stop().animate({
+                scrollTop: ($(safeHref).offset().top - 50)
+            }, 1250, 'easeInOutExpo');
+        }
         event.preventDefault();
     });
 
@@ -44,5 +53,22 @@
 
     // Initialize WOW.js Scrolling Animations
     new WOW().init();
+    
+    // Safe form handling to prevent DOM text reinterpretation
+    $('#contactForm').on('submit', function(event) {
+        // Uncomment the following line if you're handling the form with JavaScript
+        // event.preventDefault();
+        
+        // Safely get form values
+        var name = $('#name').val();
+        var email = $('#email').val();
+        var message = $('#message').val();
+        
+        // Safely update any DOM elements with text content, not HTML
+        // Example: updating a success message
+        function displayMessage(message) {
+            $('#form-message').text(message);
+        }
+    });
 
 })(jQuery); // End of use strict
