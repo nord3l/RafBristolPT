@@ -31,7 +31,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7'
+          ruby-version: '3.2'
           bundler-cache: true
       # No need for explicit bundle install since bundler-cache: true handles it
       - name: Build with Jekyll
@@ -52,7 +52,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7'
+          ruby-version: '3.2'
           bundler-cache: true
       - name: Build with Jekyll
         run: bundle exec jekyll build
