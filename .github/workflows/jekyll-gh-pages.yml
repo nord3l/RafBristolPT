@@ -39,7 +39,7 @@ jobs:
       - name: Build with Jekyll
         run: bundle exec jekyll build
       - name: Run HTML Proofer
-        run: bundle exec htmlproofer ./_site --checks-to-ignore ScriptCheck,LinkCheck --allow-missing-href
+        run: bundle exec htmlproofer ./_site --disable-external --allow-hash-href --check-html
 
   # Build job - only runs on master branch
   build:
