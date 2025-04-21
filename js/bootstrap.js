@@ -879,7 +879,7 @@ if (typeof jQuery === 'undefined') {
     if (selector && selector.charAt(0) === '#') {
       $parent = $(document.getElementById(selector.substr(1)))
     } else {
-      $parent = selector ? $(selector) : $()
+      $parent = $() // Return an empty jQuery object for invalid or unsafe selectors
     }
 
     return $parent && $parent.length ? $parent : $this.parent()
