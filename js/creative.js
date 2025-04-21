@@ -9,7 +9,13 @@
 
     // Safely get attribute value to prevent XSS
     function safeAttr(element, attrName) {
-        return $('<div>').text($(element).attr(attrName)).text();
+        var attrValue = $('<div>').text($(element).attr(attrName)).text();
+        try {
+            var url = new URL(attrValue, window.location.origin);
+            return url.pathname + url.search + url.hash; // Return only the relative part of the URL
+        } catch (e) {
+            return ''; // Return an empty string if the URL is invalid
+        }
     }
 
     // jQuery for page scrolling feature - requires jQuery Easing plugin
@@ -18,9 +24,12 @@
         var safeHref = safeAttr(this, 'href');
         
         if (safeHref && safeHref.length > 0) {
-            $('html, body').stop().animate({
-                scrollTop: ($(safeHref).offset().top - 50)
-            }, 1250, 'easeInOutExpo');
+            var targetElement = document.querySelector(safeHref);
+            if (targetElement) {
+                $('html, body').stop().animate({
+                    scrollTop: ($(targetElement).offset().top - 50)
+                }, 1250, 'easeInOutExpo');
+            }
         }
         event.preventDefault();
     });
