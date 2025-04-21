@@ -42,3 +42,43 @@ $theme-dark: #FF0000;
         "mixins",
         "base"
 ;
+
+// Light grey background for Services section
+#services {
+  background-color: #5d5a5a;
+  // Make all text inside Services black
+  color: #000;
+  // Make all paragraphs black
+  p {
+    color: #f6f6f6 !important;
+  }
+  // Make all links black
+  a {
+    color: #064f13 !important;
+  }
+  a:hover,
+  a:focus {
+    color: #ffffff !important;
+    text-decoration: underline;
+  }
+  // Ensure headings are black
+  h2.section-heading {
+    color: #fffcfc !important; // keep section heading black
+  }
+  h3 {
+    color: #fff !important;
+  }
+  h2 {
+    color: #fff !important;
+  }
+  // Personal trainer (service box) titles should be white for contrast
+  .service-box h3 {
+    color: #fff !important;
+  }
+}
+
+// Ensure 'Personal Training' title in About section is white
+#about h3 {
+  color: #fff !important;
+}
+;
